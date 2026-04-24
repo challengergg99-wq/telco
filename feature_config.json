@@ -1,0 +1,41 @@
+{
+  "numeric_features": [
+    "tenure",
+    "MonthlyCharges",
+    "TotalCharges",
+    "cargo_por_mes",
+    "num_servicios",
+    "cargo_sobre_media_contrato"
+  ],
+  "categorical_features": [
+    "gender",
+    "Partner",
+    "Dependents",
+    "PhoneService",
+    "MultipleLines",
+    "InternetService",
+    "OnlineSecurity",
+    "OnlineBackup",
+    "DeviceProtection",
+    "TechSupport",
+    "StreamingTV",
+    "StreamingMovies",
+    "Contract",
+    "PaperlessBilling",
+    "PaymentMethod"
+  ],
+  "binary_created": [
+    "es_cliente_nuevo",
+    "sin_servicios_extra",
+    "contrato_mensual",
+    "SeniorCitizen"
+  ],
+  "nuevas_variables": [
+    "es_cliente_nuevo",
+    "cargo_por_mes",
+    "num_servicios",
+    "sin_servicios_extra",
+    "contrato_mensual",
+    "cargo_sobre_media_contrato"
+  ]
+}
