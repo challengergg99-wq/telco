@@ -1,4 +1,4 @@
-=== HALLAZGOS DEL EDA ===
+=== HALLAZGOS DEL EDA SEMANA 1===
 
 Dataset: 7,043 clientes | 21 variables | 26.5% tasa de churn
 
@@ -29,11 +29,64 @@ Variables con mayor señal predictiva:
 
 Variable sin señal:
    - gender: ~26% en ambos grupos (descartar como feature)
-
 Problema de datos:
+
+
+=== DECISIONES DE FEATURE ENGINEERING SEMANA 2 ===
+
+Variables creadas y su hipótesis de negocio:
+
+  es_cliente_nuevo        → tenure <= 6 meses = período crítico de abandono
+  cargo_por_mes           → MonthlyCharges / (tenure+1) = velocidad de gasto
+  num_servicios           → suma de servicios activos = nivel de compromiso
+  sin_servicios_extra     → flag sin ningún servicio adicional
+  contrato_mensual        → flag Month-to-month = mayor libertad de salida
+  cargo_sobre_media_contrato → paga más que el promedio de su tipo de contrato
+
+Decisiones del Pipeline:
+
+  Imputación numérica   → mediana (robusta ante outliers en MonthlyCharges)
+  Imputación categórica → moda (valor más frecuente)
+  Escalado              → StandardScaler (necesario para logistic regression)
+  Encoding              → OneHotEncoder con handle_unknown='ignore'
+                          (evita errores con categorías no vistas en producción)
+  Split                 → 80/20 con stratify=y (mantiene proporción de churn)
+
+Data leakage prevenido:
+  → train_test_split ANTES de cualquier transformación
+  → Toda la transformación ocurre dentro del Pipeline
+  → El preprocessor se fitea SOLO en X_train
    - TotalCharges venía como string → convertido a numérico
    - 11 nulos en TotalCharges = clientes con tenure=0 → imputar con 0
 
 Desbalance de clases: 73.5% / 26.5%
 →  AUC-ROC y F1-score como métricas principales, NO accuracy
+
+=== DECISIONES DE MODELADO — SEMANA 3 ===
+
+¿Por qué empezar con Logistic Regression?
+  → Es el baseline interpretable. Sus coeficientes dicen exactamente qué
+    variable empuja hacia churn y cuánto. Si ya da un AUC decente,
+    justifica la complejidad de un modelo de ensemble.
+
+¿Por qué class_weight='balanced' en ambos modelos?
+  → El dataset tiene ~26% de churn. Sin este ajuste, el modelo optimiza
+    para la clase mayoritaria y pierde sensibilidad al churn.
+    balanced pondera cada clase inversamente proporcional a su frecuencia.
+
+¿Por qué max_depth=8 en Random Forest?
+  → Sin límite de profundidad, los árboles crecen hasta memorizar
+    el training set (overfitting). Restringir la profundidad actúa
+    como regularización explícita.
+
+¿Por qué AUC-ROC y no accuracy?
+  → Un modelo que predice siempre No Churn tiene 73% de accuracy
+    y 0% de recall sobre churners. AUC-ROC mide la capacidad
+    discriminativa sin depender del threshold elegido.
+
+¿Cuál modelo es mejor?
+  → Depende: si necesitas explicar la decisión a negocio, LR.
+    Si priorizas performance puro, RF. En semana 4 añadimos XGBoost
+    y ajustamos el threshold para el costo real del negocio.
+
 
