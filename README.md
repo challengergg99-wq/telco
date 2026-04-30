@@ -90,3 +90,23 @@ Desbalance de clases: 73.5% / 26.5%
     y ajustamos el threshold para el costo real del negocio.
 
 
+---
+## Lo que aprendiste esta semana 4
+
+**Aprendizajes:**
+- `scale_pos_weight` en XGBoost penaliza más los errores sobre la clase minoritaria sin modificar los datos de entrenamiento
+- SMOTE genera ejemplos sintéticos interpolando entre vecinos de la clase minoritaria; útil para desbalances extremos pero puede introducir ruido
+- El threshold por defecto (0.5) es arbitrario y casi nunca es el óptimo
+- El threshold óptimo se elige según el costo relativo de cada tipo de error en el negocio, no solo por F1
+- Bajar el threshold aumenta el recall pero baja la precision, y viceversa
+
+**Preguntas típicas de entrevista:**
+
+*¿Qué es SMOTE y cuándo lo usarías?*  
+→ Crea ejemplos sintéticos de la clase minoritaria interpolando entre instancias reales. Lo usaría cuando el desbalance es extremo (>10:1) y `scale_pos_weight` solo no es suficiente. Su riesgo es introducir ejemplos artificiales que no representan la distribución real.
+
+*¿Por qué no dejar el threshold en 0.5?*  
+→ Porque 0.5 optimiza accuracy implícitamente. En churn, perder un cliente cuesta mucho más que contactar innecesariamente a uno. Ajustar el threshold a ese costo real reduce el costo total del sistema, que es lo que al negocio le importa.
+
+*¿Cuándo preferirías XGBoost sobre Random Forest?*  
+→ XGBoost construye árboles secuencialmente corrigiendo los errores del anterior (boosting), lo que generalmente da mejor performance con menos árboles. Random Forest construye árboles en paralelo de forma independiente (bagging), es más robusto al overfitting y más fácil de paralelizar. Para datasets tabulares medianos, XGBoost suele ganar en métricas; para producción con restricciones de latencia, Random Forest puede ser preferible.
